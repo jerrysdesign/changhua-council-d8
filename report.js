@@ -82,31 +82,85 @@ function renderRoster() {
   });
 }
 
+function chartAxis(maximum) {
+  return chartScales.scaleLinear().domain([0, maximum]).range([0, 100]).nice(4);
+}
+
+function drawDotPlot(container, rows, scale, format, names, gapFormat) {
+  const axis = element("div", undefined, "dot-axis");
+  axis.setAttribute("aria-hidden", "true");
+  const ticks = element("div", undefined, "dot-ticks");
+  const axisTicks = scale.ticks(4);
+  axisTicks.forEach(value => {
+    const tick = element("span", format(value));
+    tick.style.left = scale(value) + "%";
+    ticks.append(tick);
+  });
+  axis.append(ticks);
+  const list = element("ul", undefined, "dot-rows");
+  rows.forEach(({name, values}) => {
+    const row = element("li", undefined, "dot-row");
+    const line = element("div", undefined, "dot-line");
+    line.setAttribute("aria-hidden", "true");
+    const positions = values.map(scale);
+    const [left, right] = [Math.min(...positions), Math.max(...positions)];
+    const range = element("span", undefined, "dot-range");
+    range.style.left = left + "%";
+    range.style.width = (right - left) + "%";
+    line.append(range);
+    const labels = element("span", undefined, "dot-values");
+    values.forEach((value, i) => {
+      const dot = element("span", undefined, "plot-dot series-" + i);
+      dot.style.left = positions[i] + "%";
+      line.append(dot);
+      const label = element("span", format(value), "dot-value series-key series-" + i);
+      label.setAttribute("aria-label", names[i] + " " + format(value));
+      labels.append(label);
+    });
+    if (values.length === 2) {
+      const gap = values[0] - values[1];
+      const gapLabel = gap === 0 ? "持平" : (gap > 0 ? names[0] : names[1]) + " +" + gapFormat(Math.abs(gap));
+      labels.append(element("small", gapLabel, "dot-gap"));
+    }
+    row.append(element("span", name, "dot-place"), line, labels);
+    list.append(row);
+  });
+  container.replaceChildren(axis, list);
+}
+
 function drawComparison() {
   const selections = [...new Set([first.value, second.value].filter(Boolean))].map(Number);
   const mode = metric.value;
-  const scale = mode === "votes" ? 6000 : 1;
+  const counts = mode === "votes";
+  const names = selections.map(index => historicalNames[index]);
   const legend = selections.map((index, series) =>
     element("span", historicalNames[index] + " ／ 全區 " + numbers.format(sums[index + 1]) + " 票", "series-key series-" + series)
   );
   document.querySelector("#chart-summary").replaceChildren(...legend);
-  document.querySelector("#chart-scale").textContent = mode === "votes"
-    ? "全圖共用同一尺度，橫條滿格為 6,000 票。"
-    : "橫條滿格為 100%。分母為" + (mode === "local" ? "該鄉鎮有效票。" : "各候選人的全區得票。");
+  document.querySelector("#chart-scale").textContent = counts
+    ? "各鄉鎮使用相同票數刻度。連線越長，兩人票數差距越大。"
+    : "分母為" + (mode === "local" ? "各鄉鎮有效票。" : "各候選人的全區得票。") + "差距以百分點表示。";
+  const allValues = townships.map(([name, valid, ...votes]) => ({
+    name,
+    values: votes.map((amount, index) => counts ? amount : amount / (mode === "local" ? valid : sums[index + 1]))
+  }));
+  const upper = Math.max(...allValues.flatMap(row => row.values));
+  const rows = allValues.map(({name, values}) => ({name, values: selections.map(index => values[index])}));
+  const format = counts ? value => numbers.format(value) : value => percentages.format(value);
+  drawDotPlot(document.querySelector("#comparison"), rows, chartAxis(upper), format, names,
+    counts ? value => numbers.format(value) + "票" : percentagePoint);
+}
 
-  const charts = townships.map(([town, valid, ...votes]) => {
-    const group = element("section");
-    const bars = element("ul", undefined, "bars");
-    const label = element("h3", town);
-    selections.forEach((index, series) => {
-      const amount = votes[index];
-      const value = mode === "votes" ? amount : amount / (mode === "local" ? valid : sums[index + 1]);
-      bars.append(barRow(historicalNames[index], mode === "votes" ? numbers.format(value) : percentages.format(value), value / scale, "series-" + series));
-    });
-    group.append(label, bars);
-    return group;
-  });
-  document.querySelector("#comparison").replaceChildren(...charts);
+function percentagePoint(value) {
+  return (value * 100).toFixed(2) + " 百分點";
+}
+
+function drawHeatKey(container, upper, format) {
+  const color = chartScales.scaleLinear().domain([0, upper]).range(["#f3f7fa", "#739bc1"]).clamp(true);
+  const ramp = element("span", undefined, "heat-ramp");
+  ramp.style.background = "linear-gradient(to right, " + color(0) + ", " + color(upper) + ")";
+  container.replaceChildren(element("span", format(0)), ramp, element("span", format(upper)));
+  return color;
 }
 
 function appendTableRow(section, values, header = false) {
@@ -139,18 +193,36 @@ function renderRanking() {
   document.querySelector("#ranking").replaceChildren(...rows);
 }
 
+function turnoutRow(name, electors, ballots, valid, className = "") {
+  const row = barRow(name, percentages.format(ballots / electors), 0, className);
+  const track = row.querySelector(".track");
+  track.classList.add("turnout-track");
+  track.removeAttribute("aria-hidden");
+  track.setAttribute("role", "img");
+  const counts = [valid, ballots - valid, electors - ballots];
+  const labels = ["有效票", "無效票", "未投票"];
+  track.setAttribute("aria-label", counts.map((count, index) => labels[index] + " " + numbers.format(count)).join("、"));
+  track.replaceChildren(...counts.map((count, index) => {
+    const segment = element("span", undefined, ["valid-segment", "invalid-segment", "absent-segment"][index]);
+    segment.style.flexBasis = (100 * count / electors) + "%";
+    segment.title = labels[index] + " " + numbers.format(count);
+    return segment;
+  }));
+  return row;
+}
+
 function renderTurnout() {
   const totalElectors = turnout.reduce((sum, [electors]) => sum + electors, 0);
   const totalBallots = turnout.reduce((sum, [, ballots]) => sum + ballots, 0);
   const bars = document.querySelector("#turnout-bars");
   const table = document.querySelector("#turnout-table");
   const districtRate = totalBallots / totalElectors;
-  bars.append(barRow("全區", percentages.format(districtRate), districtRate, "district-turnout"));
+  bars.append(turnoutRow("全區", totalElectors, totalBallots, totalVotes, "district-turnout"));
   appendTableRow(table.tHead, ["鄉鎮", "選舉人數", "投票數", "投票率", "有效票", "無效票"], true);
   townships.forEach(([town, valid], index) => {
     const [electors, ballots] = turnout[index];
     const rate = ballots / electors;
-    bars.append(barRow(town, percentages.format(rate), rate));
+    bars.append(turnoutRow(town, electors, ballots, valid));
     appendTableRow(table.tBodies[0], [town, electors, ballots, percentages.format(rate), valid, ballots - valid]);
   });
   appendTableRow(table.tFoot, ["全區合計", totalElectors, totalBallots, percentages.format(districtRate), totalVotes, totalBallots - totalVotes]);
@@ -164,11 +236,12 @@ function drawHeatmap() {
   const rows = rankedCandidates.map(index => townships.map(([, valid, ...votes]) =>
     votes[index] / (local ? valid : sums[index + 1])
   ));
-  const maxShare = Math.max(...rows.flat());
+  const upper = local ? 0.4 : 1;
+  const color = drawHeatKey(document.querySelector("#district-heat-key"), upper, value => percentages.format(value));
   rows.forEach((shares, rank) => {
     const row = appendTableRow(body, [historicalNames[rankedCandidates[rank]], ...shares.map(share => percentages.format(share))]);
     shares.forEach((share, column) => {
-      row.cells[column + 1].style.setProperty("--heat", (10 + 44 * share / maxShare) + "%");
+      row.cells[column + 1].style.background = color(share);
     });
   });
   document.querySelector("#heat-note").textContent = (local

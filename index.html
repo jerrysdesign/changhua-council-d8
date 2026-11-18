@@ -6,14 +6,17 @@
   <meta name="description" content="2026 彰化縣議員第八選區候選人，以及二林、芳苑、大城、竹塘的 2022 年開票比較與票量試算。">
   <title>2026 彰化縣議員第八選區｜選情資料</title>
   <link rel="stylesheet" href="style.css">
+  <script src="chart-scales.js" defer></script>
   <script src="report.js" defer></script>
+  <script src="village-data.js" defer></script>
+  <script src="village-explorer.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">跳至主要內容</a>
 <header class="top">
   <div class="wrap top-inner">
     <a class="brand" href="#main"><span aria-hidden="true">▥</span> 彰化縣議員第八選區</a>
-    <nav aria-label="報告章節"><a href="#candidates">候選人</a><a href="#regions">四鄉鎮</a><a href="#votes">開票圖表</a><a href="#questions">研究觀察</a><a href="#model">票量試算</a></nav>
+    <nav aria-label="報告章節"><a href="#candidates">候選人</a><a href="#regions">四鄉鎮</a><a href="#votes">開票圖表</a><a href="#villages">村里開票</a><a href="#questions">研究觀察</a><a href="#model">票量試算</a></nav>
   </div>
 </header>
 <main id="main">
@@ -53,10 +56,10 @@
     <section class="section" id="regions">
       <div class="section-head"><div><p class="eyebrow">2022 年開票紀錄</p><h2>四鄉鎮的得票地理</h2></div><p>二林與芳苑合計 42,436 票，占全區 71.0%。票量占比的分母是全區有效票，投票率的分母是各鄉鎮選舉人數。</p></div>
       <div class="region-grid">
-        <article class="region a"><div class="region-title"><h3>二林鎮</h3><strong>25,094<span> 票</span></strong></div><p class="caption">占全區 42.0% ／ 投票率 63.87%</p><p>張國棟在二林獲 5,674 票，居鎮內首位。這批票占他全區得票 61.4%。</p></article>
-        <article class="region b"><div class="region-title"><h3>芳苑鄉</h3><strong>17,342<span> 票</span></strong></div><p class="caption">占全區 29.0% ／ 投票率 66.28%</p><p>洪子超 3,415 票、洪騰明 3,388 票，兩人居鄉內前兩名，相差 27 票。</p></article>
-        <article class="region c"><div class="region-title"><h3>大城鄉</h3><strong>8,790<span> 票</span></strong></div><p class="caption">占全區 14.7% ／ 投票率 67.45%</p><p>吳淑娟獲 2,996 票，占鄉內有效票 34.08%，也是她四鄉鎮中得票最多的一鄉。</p></article>
-        <article class="region d"><div class="region-title"><h3>竹塘鄉</h3><strong>8,575<span> 票</span></strong></div><p class="caption">占全區 14.3% ／ 投票率 74.62%</p><p>投票率為四鄉鎮最高。陳一惇 1,593 票、洪子超 1,554 票，兩人相差 39 票。</p></article>
+        <article class="region a"><div class="region-title"><h3>二林鎮</h3><strong>25,094<span> 票</span></strong></div><p class="caption">占全區 42.0% ／ 投票率 63.87%</p><p>張國棟在二林獲 5,674 票，居鎮內首位。這批票占他全區得票 61.4%。</p><a class="local-drill" href="#villages" data-village-town="二林鎮">查看二林鎮村里開票 <span aria-hidden="true">↓</span></a></article>
+        <article class="region b"><div class="region-title"><h3>芳苑鄉</h3><strong>17,342<span> 票</span></strong></div><p class="caption">占全區 29.0% ／ 投票率 66.28%</p><p>洪子超 3,415 票、洪騰明 3,388 票，兩人居鄉內前兩名，相差 27 票。</p><a class="local-drill" href="#villages" data-village-town="芳苑鄉">查看芳苑鄉村里開票 <span aria-hidden="true">↓</span></a></article>
+        <article class="region c"><div class="region-title"><h3>大城鄉</h3><strong>8,790<span> 票</span></strong></div><p class="caption">占全區 14.7% ／ 投票率 67.45%</p><p>吳淑娟獲 2,996 票，占鄉內有效票 34.08%，也是她四鄉鎮中得票最多的一鄉。</p><a class="local-drill" href="#villages" data-village-town="大城鄉">查看大城鄉村里開票 <span aria-hidden="true">↓</span></a></article>
+        <article class="region d"><div class="region-title"><h3>竹塘鄉</h3><strong>8,575<span> 票</span></strong></div><p class="caption">占全區 14.3% ／ 投票率 74.62%</p><p>投票率為四鄉鎮最高。陳一惇 1,593 票、洪子超 1,554 票，兩人相差 39 票。</p><a class="local-drill" href="#villages" data-village-town="竹塘鄉">查看竹塘鄉村里開票 <span aria-hidden="true">↓</span></a></article>
       </div>
     </section>
 
@@ -79,8 +82,11 @@
           <ol class="ranking" id="ranking"></ol>
         </section>
         <section class="panel historical-chart" aria-labelledby="turnout-title">
-          <h3 id="turnout-title">四鄉鎮投票率</h3>
-          <p class="caption">橫條滿格為 100%。投票數包含有效票和無效票。</p>
+          <h3 id="turnout-title">投票參與與票數組成</h3>
+          <p class="caption">各橫條代表該區全部選舉人。右側標示投票率。</p>
+          <ul class="segment-legend" aria-label="票數組成圖例">
+            <li class="valid-segment">有效票</li><li class="invalid-segment">無效票</li><li class="absent-segment">未投票</li>
+          </ul>
           <ul class="bars turnout-bars" id="turnout-bars"></ul>
           <details>
             <summary>查看投票人數與有效、無效票</summary>
@@ -92,9 +98,10 @@
       </div>
       <section class="panel historical-chart historical-block" aria-labelledby="heat-title">
         <div class="heat-head">
-          <div><h3 id="heat-title">候選人得票熱圖</h3><p class="caption" id="heat-note" aria-live="polite">每欄以該鄉鎮有效票為分母。顏色越深，數值越高。</p></div>
+          <div><h3 id="heat-title">候選人得票熱圖</h3><p class="caption" id="heat-note" aria-live="polite"></p></div>
           <label>熱圖指標<select id="heat-metric"><option value="local">鄉鎮內得票率</option><option value="personal">占個人全區得票</option></select></label>
         </div>
+        <div class="heat-key" id="district-heat-key" aria-hidden="true"></div>
         <div class="table-scroll heat-scroll" tabindex="0" role="region" aria-label="候選人得票熱圖，可橫向捲動">
           <table id="heat-table" class="heat-table" aria-describedby="heat-note"><thead></thead><tbody></tbody></table>
         </div>
@@ -112,6 +119,56 @@
         <div id="comparison" class="comparison"></div>
         <details><summary>查看四鄉鎮完整開票表</summary><div class="table-scroll" tabindex="0" role="region" aria-label="四鄉鎮開票表，可橫向捲動"><table id="vote-table"><caption>2022 年第八選區：各鄉鎮有效票與候選人得票</caption><thead></thead><tbody></tbody><tfoot></tfoot></table></div></details>
       </section>
+    </section>
+
+    <section class="section" id="villages" aria-labelledby="villages-title">
+      <div class="section-head">
+        <div><p class="eyebrow">2022 年第八選區開票</p><h2 id="villages-title">村里開票比較</h2></div>
+        <p>涵蓋二林、芳苑、大城、竹塘共 82 個村里。用雙點圖看兩人差距，或在熱圖中同時比較七位候選人。</p>
+      </div>
+      <div class="panel village-panel">
+        <div class="village-toolbar">
+          <div class="view-switch" role="group" aria-label="村里圖表">
+            <button id="village-dots-tab" type="button" aria-pressed="true">兩人比較</button>
+            <button id="village-heat-tab" type="button" aria-pressed="false">七人熱圖</button>
+          </div>
+          <div class="controls">
+            <label>鄉鎮<select id="village-town"></select></label>
+            <label>村里圖表指標<select id="village-metric"><option value="votes">得票數</option><option value="rate">村里內得票率</option></select></label>
+          </div>
+        </div>
+        <div id="village-dots">
+          <div class="controls village-compare-controls">
+            <label>候選人 A<select id="village-first"></select></label>
+            <label>候選人 B<select id="village-second"></select></label>
+            <label>排序<select id="village-sort"><option value="gap">差距由大到小</option><option value="valid">有效票由多至少</option><option value="name">村里名稱</option></select></label>
+          </div>
+          <div class="chart-legend" id="village-legend"></div>
+          <p class="caption" id="village-plot-note" aria-live="polite"></p>
+          <div id="village-plot" tabindex="0" role="region" aria-label="村里雙點圖，可捲動"></div>
+        </div>
+        <div id="village-heat" hidden>
+          <p class="caption" id="village-heat-note" aria-live="polite"></p>
+          <div class="heat-key" id="village-heat-key" aria-hidden="true"></div>
+          <div class="table-scroll village-scroll" tabindex="0" role="region" aria-label="村里得票熱圖，可捲動">
+            <table id="village-heat-table" class="heat-table village-heat-table" aria-describedby="village-heat-note"><thead></thead><tbody></tbody></table>
+          </div>
+        </div>
+      </div>
+      <div class="panel historical-block village-detail" id="village-detail">
+        <div class="heat-head">
+          <div><h3>單一村里開票明細</h3><p class="caption" id="village-detail-note" aria-live="polite"></p></div>
+          <label>檢視村里<select id="village-name"></select></label>
+        </div>
+        <ul class="bars" id="village-detail-bars" aria-label="該村里七位候選人得票"></ul>
+        <details>
+          <summary>查看所選鄉鎮全部村里的票數表</summary>
+          <div class="table-scroll village-scroll" tabindex="0" role="region" aria-label="村里完整開票表，可捲動">
+            <table id="village-full-table"><caption>2022 年第八選區村里開票</caption><thead></thead><tbody></tbody><tfoot></tfoot></table>
+          </div>
+        </details>
+        <p class="caption village-source"><a id="village-source-link">VoteTW 村里開票原始資料 ↗</a></p>
+      </div>
     </section>
 
     <section class="section" id="questions">
