@@ -10,13 +10,15 @@
   <script src="report.js" defer></script>
   <script src="village-data.js" defer></script>
   <script src="village-explorer.js" defer></script>
+  <script src="village-map-data.js" defer></script>
+  <script src="village-map.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">跳至主要內容</a>
 <header class="top">
   <div class="wrap top-inner">
     <a class="brand" href="#main"><span aria-hidden="true">▥</span> 彰化縣議員第八選區</a>
-    <nav aria-label="報告章節"><a href="#candidates">候選人</a><a href="#regions">四鄉鎮</a><a href="#votes">開票圖表</a><a href="#villages">村里開票</a><a href="#questions">研究觀察</a><a href="#model">票量試算</a></nav>
+    <nav aria-label="報告章節"><a href="#candidates">候選人</a><a href="#regions">四鄉鎮</a><a href="#votes">開票圖表</a><a href="#map">村里地圖</a><a href="#villages">村里開票</a><a href="#questions">研究觀察</a><a href="#model">票量試算</a></nav>
   </div>
 </header>
 <main id="main">
@@ -119,6 +121,40 @@
         <div id="comparison" class="comparison"></div>
         <details><summary>查看四鄉鎮完整開票表</summary><div class="table-scroll" tabindex="0" role="region" aria-label="四鄉鎮開票表，可橫向捲動"><table id="vote-table"><caption>2022 年第八選區：各鄉鎮有效票與候選人得票</caption><thead></thead><tbody></tbody><tfoot></tfoot></table></div></details>
       </section>
+    </section>
+
+    <section class="section" id="map" aria-labelledby="map-title">
+      <div class="section-head">
+        <div><p class="eyebrow">2022 年第八選區開票</p><h2 id="map-title">村里得票地圖</h2></div>
+        <p>點選地圖上的村里，或用清單查找。比較後可展開票數表，核對各村里的原始數字。</p>
+      </div>
+      <div class="panel map-panel">
+        <div class="controls map-controls">
+          <label>地圖指標<select id="map-metric">
+            <option value="margin">兩人得票率差距</option><option value="share">候選人得票率</option><option value="votes">候選人得票數</option>
+            <option value="winner">各村里最高票</option><option value="turnout">投票率</option><option value="valid">有效票量</option>
+          </select></label>
+          <label>地圖範圍<select id="map-town"><option value="">全選區</option></select></label>
+          <label id="map-first-field">第一位候選人<select id="map-first"></select></label>
+          <label id="map-second-field">第二位候選人<select id="map-second"></select></label>
+        </div>
+        <div class="map-layout">
+          <div class="map-main">
+            <div class="map-canvas">
+              <svg id="election-map-svg" role="img" aria-label="第八選區村里地圖。點選村里，或用旁邊的清單查看數字。" xmlns="http://www.w3.org/2000/svg"></svg>
+              <span class="map-north" aria-label="北方在上方">北 ↑</span>
+            </div>
+            <div class="map-legend" id="map-legend" aria-label="地圖圖例"></div>
+            <p id="map-caption" class="caption"></p>
+          </div>
+          <aside class="map-readout" aria-label="選取村里資料">
+            <label>查找村里<select id="map-place"></select></label>
+            <div id="map-detail" aria-live="polite"></div>
+            <a id="map-detail-link" href="#village-detail">看這個村里的完整開票 ↓</a>
+          </aside>
+        </div>
+        <p class="caption map-source">開票資料：<a href="https://votetw.com/wiki/2022年彰化縣議員選舉第8選舉區投票結果">VoteTW 第八選區</a>　圖資：<a id="map-source-link" href="https://data.gov.tw/dataset/7440">內政部國土測繪中心村里界圖</a>（2026 年 8 月版，已簡化）。票數為 2022 年開票資料。</p>
+      </div>
     </section>
 
     <section class="section" id="villages" aria-labelledby="villages-title">

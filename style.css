@@ -341,3 +341,102 @@ footer a { color: #e7e4f1; }
   .dot-ticks span:nth-child(even):not(:last-child) { display: none; }
   #village-detail-bars li { grid-template-columns: 4.25em minmax(1em, 1fr) 8.5em; gap: 6px; font-size: .82rem; }
 }
+
+.map-panel { padding: clamp(12px, 2.8vw, 26px); }
+.map-controls { margin-bottom: 16px; gap: 10px 14px; }
+.map-controls [hidden] { display: none; }
+.map-controls select { max-width: 100%; }
+.map-layout { display: grid; grid-template-columns: minmax(0, 2.35fr) minmax(245px, 1fr); align-items: start; gap: 18px; }
+.map-main { min-width: 0; }
+.map-canvas {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 62% 28%, #f2f7f7, #e2edf1 76%);
+  border: 1px solid #d2e0e5;
+  border-radius: 12px;
+}
+#election-map-svg { display: block; width: 100%; height: min(550px, 65vw); }
+.map-north {
+  position: absolute;
+  right: 13px;
+  top: 12px;
+  padding: 2px 8px;
+  border: 1px solid #d1e0e5;
+  border-radius: 5px;
+  background: #f8fbfc;
+  color: #455b78;
+  font-size: .76rem;
+  font-weight: 800;
+  pointer-events: none;
+}
+.map-villages path {
+  cursor: pointer;
+  stroke: #fff;
+  stroke-width: .7;
+  vector-effect: non-scaling-stroke;
+  fill-rule: evenodd;
+}
+.map-villages path:hover { stroke: #253c54; stroke-width: 1.5; }
+.map-outlines, .map-town-labels, #map-selection { pointer-events: none; }
+.map-outlines path { fill: none; stroke: #5c707e; stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+.map-symbols circle { cursor: pointer; fill-opacity: .66; stroke: #fbfdff; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.map-symbols circle:hover { fill-opacity: 1; }
+.map-town-labels text {
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 19px;
+  font-weight: 850;
+  fill: #22384e;
+  stroke: #f9fcfd;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  letter-spacing: .1em;
+}
+.map-selected { fill: none; stroke: #142d45; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.map-pin { fill: #f7fbfe; stroke: #142d45; stroke-width: 1.45; vector-effect: non-scaling-stroke; }
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  margin-top: 12px;
+  font-size: .79rem;
+  color: #334b62;
+  font-variant-numeric: tabular-nums;
+}
+.map-key { display: inline-flex; align-items: center; gap: 5px; }
+.map-key i { width: 12px; height: 12px; border-radius: 3px; }
+.map-key .map-circle-key { background: #5080a8; border-radius: 50%; }
+.map-ramp { width: 100%; height: 10px; border: 1px solid #d3e0e7; border-radius: 4px; }
+.map-ramp-labels { display: flex; justify-content: space-between; width: 100%; gap: 8px; line-height: 1.4; }
+.map-ramp-labels span:last-child { text-align: right; }
+#map-caption { margin-top: 7px; }
+.map-readout { border: 1px solid #d7e1e7; background: #f2f6f8; padding: 16px; border-radius: 12px; }
+.map-readout label { display: grid; gap: 4px; }
+.map-readout select { width: 100%; }
+.map-town-name { margin-top: 16px; color: #526981; font-size: .82rem; font-weight: 750; }
+#map-detail h3 { margin-top: 2px; font-size: 1.55rem; }
+.map-stat { margin-top: 6px; font-size: 1.03rem; font-weight: 800; }
+.map-breakdown { margin: 10px 0; font-variant-numeric: tabular-nums; }
+.map-breakdown div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding-block: 6px;
+  border-top: 1px solid #dce5ea;
+  font-size: .86rem;
+}
+.map-breakdown dd { margin: 0; text-align: right; font-weight: 750; }
+#map-detail-link { display: inline-block; margin-top: 11px; color: #345d8c; font-size: .88rem; font-weight: 760; text-underline-offset: .2em; }
+.map-source { margin-top: 15px; border-top: 1px solid var(--line); padding-top: 11px; }
+@media (max-width: 780px) {
+  .map-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  #election-map-svg { height: min(550px, 87vw); }
+}
+@media (max-width: 420px) {
+  .map-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .map-controls select { width: 100%; font-size: .82rem; padding-inline: 6px; }
+  .map-ramp-labels { font-size: .72rem; }
+}
