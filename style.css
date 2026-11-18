@@ -431,6 +431,10 @@ footer a { color: #e7e4f1; }
 .map-breakdown dd { margin: 0; text-align: right; font-weight: 750; }
 #map-detail-link { display: inline-block; margin-top: 11px; color: #345d8c; font-size: .88rem; font-weight: 760; text-underline-offset: .2em; }
 .map-source { margin-top: 15px; border-top: 1px solid var(--line); padding-top: 11px; }
+#map-population-summary { margin-top: 6px; }
+#map-population-table .table-scroll { max-height: 24rem; overflow: auto; }
+#map-population-table thead { position: sticky; top: 0; }
+#map-population-table :is(td, th):nth-child(2) { text-align: left; }
 @media (max-width: 780px) {
   .map-layout { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   #election-map-svg { height: min(550px, 87vw); }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="2026 彰化縣議員第八選區候選人，以及二林、芳苑、大城、竹塘的 2022 年開票比較與票量試算。">
+  <meta name="description" content="彰化縣議員第八選區選情資料。查詢二林、芳苑、大城、竹塘 82 個村里的 2026 年戶籍人口與 2022 年開票結果。">
   <title>2026 彰化縣議員第八選區｜選情資料</title>
   <link rel="stylesheet" href="style.css">
   <script src="chart-scales.js" defer></script>
@@ -11,6 +11,7 @@
   <script src="village-data.js" defer></script>
   <script src="village-explorer.js" defer></script>
   <script src="village-map-data.js" defer></script>
+  <script src="village-population.js" defer></script>
   <script src="village-map.js" defer></script>
 </head>
 <body>
@@ -125,14 +126,17 @@
 
     <section class="section" id="map" aria-labelledby="map-title">
       <div class="section-head">
-        <div><p class="eyebrow">2022 年第八選區開票</p><h2 id="map-title">村里得票地圖</h2></div>
-        <p>點選地圖上的村里，或用清單查找。比較後可展開票數表，核對各村里的原始數字。</p>
+        <div><p class="eyebrow">彰化縣議員第八選區</p><h2 id="map-title">村里地圖</h2></div>
+        <p>切換 2026 年戶籍人口與 2022 年開票指標。點選地圖或用清單查找村里。</p>
       </div>
       <div class="panel map-panel">
         <div class="controls map-controls">
           <label>地圖指標<select id="map-metric">
-            <option value="margin">兩人得票率差距</option><option value="share">候選人得票率</option><option value="votes">候選人得票數</option>
-            <option value="winner">各村里最高票</option><option value="turnout">投票率</option><option value="valid">有效票量</option>
+            <option value="population">2026 年戶籍人口</option>
+            <optgroup label="2022 年縣議員開票">
+              <option value="margin" selected>兩人得票率差距</option><option value="share">候選人得票率</option><option value="votes">候選人得票數</option>
+              <option value="winner">各村里最高票</option><option value="turnout">投票率</option><option value="valid">有效票量</option>
+            </optgroup>
           </select></label>
           <label>地圖範圍<select id="map-town"><option value="">全選區</option></select></label>
           <label id="map-first-field">第一位候選人<select id="map-first"></select></label>
@@ -150,10 +154,24 @@
           <aside class="map-readout" aria-label="選取村里資料">
             <label>查找村里<select id="map-place"></select></label>
             <div id="map-detail" aria-live="polite"></div>
-            <a id="map-detail-link" href="#village-detail">看這個村里的完整開票 ↓</a>
+            <a id="map-detail-link" href="#village-detail">看這個村里的 2022 年完整開票 ↓</a>
           </aside>
         </div>
-        <p class="caption map-source">開票資料：<a href="https://votetw.com/wiki/2022年彰化縣議員選舉第8選舉區投票結果">VoteTW 第八選區</a>　圖資：<a id="map-source-link" href="https://data.gov.tw/dataset/7440">內政部國土測繪中心村里界圖</a>（2026 年 8 月版，已簡化）。票數為 2022 年開票資料。</p>
+        <details id="map-population-table" open hidden>
+          <summary>查看村里戶籍人口表</summary>
+          <p id="map-population-summary" class="caption" aria-live="polite"></p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="各村里戶籍人口表，可捲動">
+            <table>
+              <thead><tr><th scope="col">村里</th><th scope="col">鄉鎮</th><th scope="col" aria-sort="descending">戶籍人口</th><th scope="col">戶數</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </details>
+        <p class="caption map-source">
+          <span id="map-votes-source">2022 年開票資料來自 <a href="https://votetw.com/wiki/2022年彰化縣議員選舉第8選舉區投票結果">VoteTW 第八選區</a>。</span>
+          <span id="map-population-source" hidden>2026 年 10 月底人口來自<a href="https://www.chcg.gov.tw/HSO/erhlin/03search/sea_b2_01.aspx">二林戶政事務所村里戶籍報表</a>。選舉人數以選委會公告為準。</span>
+          村里界線採<a id="map-source-link" href="https://data.gov.tw/dataset/7440">國土測繪中心圖資</a>（2026 年 8 月版，已簡化）。
+        </p>
       </div>
     </section>
 

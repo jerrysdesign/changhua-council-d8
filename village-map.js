@@ -16,11 +16,15 @@ const mapColors = {
   sequential: ["#edf4f8", "#245d90"], symbol: "#285c91"
 };
 const winnerColors = ["#b57a12", "#2b7797", "#86538f", "#8b6350", "#17766c", "#a74053", "#4b58a0"];
-const mapRecords = electionMapGeometry.villages.map(geometry => ({
-  ...villageGroups[geometry.town].find(village => village.name === geometry.name),
-  ...geometry,
-  key: geometry.town + "/" + geometry.name
-}));
+const mapRecords = electionMapGeometry.villages.map(geometry => {
+  const {town, name} = geometry;
+  const [population, households] = villagePopulation2026[town][name];
+  return {
+    ...villageGroups[town].find(village => village.name === name),
+    ...geometry, population, households,
+    key: town + "/" + name
+  };
+});
 const mapByKey = new Map(mapRecords.map(record => [record.key, record]));
 
 function svgMark(name, attributes, text) {
@@ -48,16 +52,18 @@ function signedPoints(value) {
 
 function mapScale(options) {
   const {mode, a, b} = options;
-  const symbol = mode === "votes" || mode === "valid";
+  const symbol = ["votes", "valid", "population"].includes(mode);
   const value = {
     margin: record => (record.votes[a] - record.votes[b]) / record.valid,
     share: record => record.votes[a] / record.valid,
     votes: record => record.votes[a],
     winner: record => villageWinners(record.votes),
     turnout: record => record.ballots / record.electors,
-    valid: record => record.valid
+    valid: record => record.valid,
+    population: record => record.population
   }[mode];
-  const format = symbol ? number => numbers.format(number) + " 票" : number => percentages.format(number);
+  const symbolUnit = mode === "population" ? " 人" : " 票";
+  const format = symbol ? number => numbers.format(number) + symbolUnit : number => percentages.format(number);
 
   if (mode === "winner") {
     return {
@@ -85,7 +91,7 @@ function mapScale(options) {
   if (symbol) {
     const basis = 10 ** Math.floor(Math.log10(maxValue));
     const max = Math.ceil(maxValue / basis) * basis;
-    const radius = vote => Math.sqrt(vote / max) * 16;
+    const radius = count => Math.sqrt(count / max) * 16;
     return {value, radius, format, sizes: [max / 4, max / 2, max], color: () => "#e8ece8"};
   }
 
@@ -198,7 +204,8 @@ function renderMapDetail() {
     votes: [[first, votesLabel(a)]],
     winner: villageWinners(record.votes).map(index => [historicalNames[index], votesLabel(index)]),
     turnout: [["投票人數", numbers.format(record.ballots) + " 人"], ["選舉人數", numbers.format(record.electors) + " 人"]],
-    valid: [["有效票", numbers.format(record.valid) + " 票"], ["無效票", numbers.format(record.ballots - record.valid) + " 票"]]
+    valid: [["有效票", numbers.format(record.valid) + " 票"], ["無效票", numbers.format(record.ballots - record.valid) + " 票"]],
+    population: [["戶數", numbers.format(record.households) + " 戶"]]
   }[mode];
   const headline = {
     margin: margin === 0 ? "兩人同票" : (margin > 0 ? first : second) + " " + signedPoints(Math.abs(margin)),
@@ -206,8 +213,11 @@ function renderMapDetail() {
     votes: numbers.format(record.votes[a]) + " 票",
     winner: "村里最高票",
     turnout: percentages.format(record.ballots / record.electors),
-    valid: numbers.format(record.valid) + " 票"
+    valid: numbers.format(record.valid) + " 票",
+    population: numbers.format(record.population) + " 人"
   }[mode];
+  const footnote = mode === "population" ? "2026 年 10 月 31 日戶籍統計" :
+    "村里有效票 " + numbers.format(record.valid) + " ／ 投票率 " + percentages.format(record.ballots / record.electors);
   const breakdown = element("dl", undefined, "map-breakdown");
   rows.forEach(([label, value]) => {
     const row = element("div");
@@ -219,27 +229,48 @@ function renderMapDetail() {
     element("h3", record.name),
     element("p", headline, "map-stat"),
     breakdown,
-    element("p", "村里有效票 " + numbers.format(record.valid) + " ／ 投票率 " + percentages.format(record.ballots / record.electors), "caption")
+    element("p", footnote, "caption")
   );
+}
+
+function renderPopulationTable(records) {
+  const table = document.querySelector("#map-population-table");
+  const body = table.querySelector("tbody");
+  const rows = [...records].sort((a, b) => b.population - a.population || a.key.localeCompare(b.key, "zh-Hant-TW"));
+  const summary = document.querySelector("#map-population-summary");
+  const scope = electionMap.town.value || "全選區";
+  const people = records.reduce((total, record) => total + record.population, 0);
+  const households = records.reduce((total, record) => total + record.households, 0);
+  summary.textContent = `${scope} ${records.length} 個村里・${numbers.format(people)} 人・${numbers.format(households)} 戶`;
+  const nextRows = document.createDocumentFragment();
+  rows.forEach(record => appendTableRow(nextRows, [record.name, record.town, record.population, record.households]));
+  body.replaceChildren(nextRows);
 }
 
 function renderElectionMap() {
   const options = mapOptions();
   const scale = mapScale(options);
+  const population = options.mode === "population";
+  const records = mapVisibleRecords();
   document.querySelector("#map-first-field").hidden = !["margin", "share", "votes"].includes(options.mode);
   document.querySelector("#map-second-field").hidden = options.mode !== "margin";
+  document.querySelector("#map-population-table").hidden = !population;
+  document.querySelector("#map-population-source").hidden = !population;
+  document.querySelector("#map-votes-source").hidden = population;
   const notes = {
     margin: "用同一村里的有效票算兩人得票率之差。色階以持平為中心，色深表示差距。",
     share: "顏色越深，這位候選人占該村里有效票的比例越高。",
     votes: "圓點面積與這位候選人在該村里的票數成正比。",
     winner: "顏色標示該村里得票最多的候選人。並列村里以灰色標記。",
     turnout: "投票率為該村里投票數除以選舉人數。色階以全選區村里的數值範圍設定。",
-    valid: "圓點面積與該村里有效票數成正比。"
+    valid: "圓點面積與該村里有效票數成正比。",
+    population: "圓點面積與各村里 2026 年 10 月底的戶籍人口成正比。"
   };
   electionMap.caption.textContent = notes[options.mode];
-  renderMapShape(mapVisibleRecords(), scale, options);
+  renderMapShape(records, scale, options);
   renderMapLegend(scale);
   renderMapDetail();
+  if (population) renderPopulationTable(records);
 }
 
 function syncMapPlaces() {
@@ -289,4 +320,5 @@ document.querySelector("#map-detail-link").addEventListener("click", () => {
   villageName.value = record.name;
   drawVillageDetail();
 });
+if (new URLSearchParams(location.search).get("map") === "population") electionMap.metric.value = "population";
 syncMapPlaces();
