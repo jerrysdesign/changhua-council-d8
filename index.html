@@ -19,7 +19,7 @@
 <header class="top">
   <div class="wrap top-inner">
     <a class="brand" href="#main"><span aria-hidden="true">▥</span> 彰化縣議員第八選區</a>
-    <nav aria-label="報告章節"><a href="#candidates">候選人</a><a href="#regions">四鄉鎮</a><a href="#votes">開票圖表</a><a href="#map">村里地圖</a><a href="#villages">村里開票</a><a href="#questions">研究觀察</a><a href="#model">票量試算</a></nav>
+    <nav aria-label="報告章節"><a href="#candidates">候選人</a><a href="#regions">四鄉鎮</a><a href="#votes">開票圖表</a><a href="#map">村里地圖</a><a href="#map-population-table">人口與選舉人數</a><a href="#villages">村里開票</a><a href="#questions">研究觀察</a><a href="#model">票量試算</a></nav>
   </div>
 </header>
 <main id="main">
@@ -157,19 +157,20 @@
             <a id="map-detail-link" href="#village-detail">看這個村里的 2022 年完整開票 ↓</a>
           </aside>
         </div>
-        <details id="map-population-table" open hidden>
-          <summary>查看村里戶籍人口表</summary>
+        <section id="map-population-table" aria-labelledby="map-population-title">
+          <h3 id="map-population-title">各村里人口與選舉人數</h3>
+          <p class="caption">戶籍人口與戶數統計截至 2026 年 10 月 31 日。截至 11 月 18 日尚未查到本屆逐村里選舉人數。依<a href="https://web.cec.gov.tw/api/file/c5b7fceb-6f5f-4202-b140-e23ebdcb50a8.pdf">彰化縣選委會時程</a>，11 月 24 日前公告選舉人數。</p>
           <p id="map-population-summary" class="caption" aria-live="polite"></p>
-          <div class="table-scroll" tabindex="0" role="region" aria-label="各村里戶籍人口表，可捲動">
+          <div class="table-scroll" tabindex="0" role="region" aria-label="各村里人口與選舉人數表，可捲動">
             <table>
-              <thead><tr><th scope="col">村里</th><th scope="col">鄉鎮</th><th scope="col" aria-sort="descending">戶籍人口</th><th scope="col">戶數</th></tr></thead>
-              <tbody></tbody>
+              <thead><tr><th scope="col">村里</th><th scope="col">鄉鎮</th><th scope="col">2026 選舉人數</th><th scope="col" aria-sort="descending">2026 戶籍人口</th><th scope="col">2026 戶數</th><th scope="col">2022 選舉人數</th></tr></thead>
+              <tbody></tbody><tfoot></tfoot>
             </table>
           </div>
-        </details>
+        </section>
         <p class="caption map-source">
-          <span id="map-votes-source">2022 年開票資料來自 <a href="https://votetw.com/wiki/2022年彰化縣議員選舉第8選舉區投票結果">VoteTW 第八選區</a>。</span>
-          <span id="map-population-source" hidden>2026 年 10 月底人口來自<a href="https://www.chcg.gov.tw/HSO/erhlin/03search/sea_b2_01.aspx">二林戶政事務所村里戶籍報表</a>。選舉人數以選委會公告為準。</span>
+          <span>2022 年開票資料來自 <a href="https://votetw.com/wiki/2022年彰化縣議員選舉第8選舉區投票結果">VoteTW 第八選區</a>。</span>
+          <span>2026 年 10 月底人口來自<a href="https://www.chcg.gov.tw/HSO/erhlin/03search/sea_b2_01.aspx">二林戶政事務所村里戶籍報表</a>。選舉人數以選委會公告為準。</span>
           村里界線採<a id="map-source-link" href="https://data.gov.tw/dataset/7440">國土測繪中心圖資</a>（2026 年 8 月版，已簡化）。
         </p>
       </div>

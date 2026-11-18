@@ -243,20 +243,22 @@ function renderPopulationTable(records) {
   const households = records.reduce((total, record) => total + record.households, 0);
   summary.textContent = `${scope} ${records.length} 個村里・${numbers.format(people)} 人・${numbers.format(households)} 戶`;
   const nextRows = document.createDocumentFragment();
-  rows.forEach(record => appendTableRow(nextRows, [record.name, record.town, record.population, record.households]));
+  rows.forEach(record => appendTableRow(nextRows, [
+    record.name, record.town, "待公告", record.population, record.households, record.electors
+  ]));
   body.replaceChildren(nextRows);
+  const footer = table.querySelector("tfoot");
+  footer.replaceChildren();
+  const electors2022 = records.reduce((total, record) => total + record.electors, 0);
+  appendTableRow(footer, ["合計", scope, "待公告", people, households, electors2022]);
 }
 
 function renderElectionMap() {
   const options = mapOptions();
   const scale = mapScale(options);
-  const population = options.mode === "population";
   const records = mapVisibleRecords();
   document.querySelector("#map-first-field").hidden = !["margin", "share", "votes"].includes(options.mode);
   document.querySelector("#map-second-field").hidden = options.mode !== "margin";
-  document.querySelector("#map-population-table").hidden = !population;
-  document.querySelector("#map-population-source").hidden = !population;
-  document.querySelector("#map-votes-source").hidden = population;
   const notes = {
     margin: "用同一村里的有效票算兩人得票率之差。色階以持平為中心，色深表示差距。",
     share: "顏色越深，這位候選人占該村里有效票的比例越高。",
@@ -270,7 +272,7 @@ function renderElectionMap() {
   renderMapShape(records, scale, options);
   renderMapLegend(scale);
   renderMapDetail();
-  if (population) renderPopulationTable(records);
+  renderPopulationTable(records);
 }
 
 function syncMapPlaces() {
